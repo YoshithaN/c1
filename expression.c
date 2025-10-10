@@ -1,0 +1,148 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h> 
+
+
+struct Node {
+    char data;
+    struct Node *left, *right;
+};
+
+
+struct Stack {
+    struct Node* data;
+    struct Stack* next;
+};
+
+struct Stack* top = NULL;
+
+
+struct Node* createNode(char value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+
+void push(struct Node* treeNode) {
+    struct Stack* temp = (struct Stack*)malloc(sizeof(struct Stack));
+    temp->data = treeNode;
+    temp->next = top;
+    top = temp;
+}
+
+struct Node* pop() {
+    if (top == NULL) return NULL;
+    struct Stack* temp = top;
+    struct Node* value = top->data;
+    top = top->next;
+    free(temp);
+    return value;
+}
+
+
+struct Node* createExpressionTree(char postfix[]) {
+    int i = 0;
+    char symbol;
+    while ((symbol = postfix[i]) != '\0') {
+        if (isdigit(symbol)) { 
+            struct Node* operandNode = createNode(symbol);
+            push(operandNode);
+        } else { 
+            struct Node* operatorNode = createNode(symbol);
+            operatorNode->right = pop();
+            operatorNode->left = pop();
+            push(operatorNode);
+        }
+        i++;
+    }
+    return pop(); 
+}
+
+
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        
+        inorder(root->left);
+        printf("%c", root->data);
+        inorder(root->right);
+        
+    }
+}
+
+
+void preorder(struct Node* root) {
+    if (root != NULL) {
+        printf("%c", root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+void postorder(struct Node* root) {
+    if (root != NULL) {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%c", root->data);
+    }
+}
+
+int main() {
+    struct Node* root = NULL;
+    int choice;
+    char postfix[100];
+
+    do {
+        printf("\nMenu\n\n");
+        printf("1.  Expression Tree\n");
+        printf("2. Inorder Traversal \n");
+        printf("3. Preorder Traversal \n");
+        printf("4. Postorder Traversal \n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); 
+
+        switch(choice) {
+            case 1:
+                printf("Enter postfix expression: ");
+                scanf("%s", postfix);
+                root = createExpressionTree(postfix);
+                printf("Expression Tree Created \n");
+                break;
+            case 2:
+                if(root == NULL) printf("Create the tree \n");
+                else {
+                    printf("Inorder Traversal : ");
+                    inorder(root);
+                    printf("\n");
+                }
+                break;
+            case 3:
+                if(root == NULL) printf("Create the tree \n");
+                else {
+                    printf("Preorder Traversal  ");
+                    preorder(root);
+                    printf("\n");
+                }
+                break;
+            case 4:
+                if(root == NULL) printf("Create the tree first!\n");
+                else {
+                    printf("Postorder Traversal : ");
+                    postorder(root);
+                    printf("\n");
+                }
+                break;
+            case 5:
+                printf("Exiting \n");
+                exit(0);
+            default:
+                printf("Invalid choice! \n");
+        }
+
+    } while(1);
+    //if(root->left && root->right) printf("(");
+
+    return 0;
+}
